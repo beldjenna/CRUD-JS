@@ -9,6 +9,9 @@ let count = document.getElementById('count');
 let category = document.getElementById('category');
 let sumbit = document.getElementById('sumbit');
 
+let mood = 'create';
+let tmp;
+
 // get total 
 function getTotal()
 {
@@ -46,7 +49,24 @@ sumbit.onclick = function(){
         category:category.value,
 
     }
-    dataPro.push(newPro);
+
+    //count
+    if(mood === 'create'){
+        if(newPro.count > 1){
+            for(let i=0; i<newPro.count; i++){
+                dataPro.push(newPro);
+
+            }
+        }else{
+            dataPro.push(newPro);
+        }
+    }else{
+        dataPro[tmp] = newPro;
+        mood = 'create';
+        sumbit.innerHTML = 'Create';
+        count.style.display = 'block';
+    }
+    
     localStorage.setItem('product', JSON.stringify(dataPro));
     console.log(newPro);
 
@@ -69,7 +89,7 @@ function clearData(){
 
 // read
 function showData (){
-
+    getTotal();
     let table = '';
     for(let i=0; i<dataPro.length; i++){
         table += `
@@ -82,19 +102,60 @@ function showData (){
             <td>${dataPro[i].discount}</td>
             <td>${dataPro[i].total}</td>
             <td>${dataPro[i].category}</td>
-            <td>${i}</td>
-            <td><button id="update">update</button></td>
-            <td><button id="update">delete</button></td>
+            <td><button onclick = "updateData(${i})" id="update">update</button></td>
+            <td><button onclick = "deleteData(${i})" id="update">delete</button></td>
         </tr>
         `
         
     }
 
     document.getElementById('tbody').innerHTML = table;
+    let btnDelete = document.getElementById('deleteAll');
+    if(dataPro.length > 0){
+        btnDelete.innerHTML = `
+        <button onclick="deleteAll()">Delete All (${dataPro.length})</button>
+        `
+    }else{
+        btnDelete.innerHTML = '';
+    }
 }
 
 showData();
 
+//delete
+
+function deleteData(i){
+    dataPro.splice(i,1);
+    localStorage.product = JSON.stringify(dataPro);
+    showData();
+}
+
+function deleteAll(){
+    dataPro.splice(0);
+    localStorage.clear();
+    showData();
+}
+
+
+
+function updateData(i){
+    title.value = dataPro[i].title;
+    price.value = dataPro[i].price;
+    taxes.value = dataPro[i].taxes;
+    ads.value = dataPro[i].ads;
+    discount.value = dataPro[i].discount;
+    getTotal();
+    count.style.display = 'none';
+    category.value = dataPro[i].category;
+    sumbit.innerHTML = 'Update';
+    mood = 'update';
+    tmp = i;
+    scroll({
+        top:0,
+        behavior:'smooth',
+    })
+
+}
 
 
 
@@ -112,13 +173,6 @@ showData();
 
 
 
-
-
-// count
-// delete
-// update
-// search
-// clean data
 
 
 
